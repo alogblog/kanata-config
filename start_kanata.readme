@@ -1,0 +1,21 @@
+
+#파워쉘을 관리자 권한으로 열고 복붙:
+#현재는 intercept 드라이버 문제로, esc2grv 하나만 실행.
+
+$exe = "C:\Users\joon\Documents\kanata\kanata_windows_gui_wintercept_cmd_allowed_x64.exe"
+$cfg1 = "C:\Users\joon\Documents\kanata\keyboard_esc2grv.kbd"
+$cfg2 = "C:\Users\joon\Documents\kanata\keyboard_general.kbd"
+
+# Task 1 - esc2grv
+$Action1 = New-ScheduledTaskAction -Execute $exe -Argument "--cfg `"$cfg1`" --tray-icon"
+$Trigger1 = New-ScheduledTaskTrigger -AtLogOn
+$Principal1 = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
+$Settings1 = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
+Register-ScheduledTask -TaskName "kanata-esc2grv" -Action $Action1 -Trigger $Trigger1 -Principal $Principal1 -Settings $Settings1 -Force
+
+# Task 2 - general
+$Action2 = New-ScheduledTaskAction -Execute $exe -Argument "--cfg `"$cfg2`" --tray-icon"
+$Trigger2 = New-ScheduledTaskTrigger -AtLogOn
+$Principal2 = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
+$Settings2 = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
+Register-ScheduledTask -TaskName "kanata-general" -Action $Action2 -Trigger $Trigger2 -Principal $Principal2 -Settings $Settings2 -Force

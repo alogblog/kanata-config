@@ -1,0 +1,57 @@
+;; layer_common.kbd (두 레이어를 명확하게 분리 정의)
+
+;; (defsrc
+;;   esc      1    2    3    4    5    6    7    8    9    0    -    =   
+;;   caps     q    w    e    r    t    y    u    i    o    p    [    ]   
+;;   a        s    d    f    g    h    j    k    l    ;    '    bksl
+;;   z        x    c    v    b    n    m    ,    .    rsft f24
+;;   lalt   spc ralt rctl    bspc enter left right up down del
+;; )
+
+;; =======================================================================
+;; [레이어 1] ★ 임시 방향키 레이어 (CapsLock 홀드 또는 Left/Right Alt 홀드 시 가동)
+;; - 내가 손가락을 꾹 누르고 있을 때만 작동하므로 주변 키를 차단(XX)하지 않고,
+;; - 오직 오른손 홈로우(HJKL)와 상단 가로줄(UIOP) 자리에만 방향키 기능을 오버레이합니다.
+;; =======================================================================
+(deflayer nav_layer
+  _        _    _     _    _    _    _    _    _     _    _    _    _   
+  _        home up    pgup _    _    _    home end   pgup pgdn _    _   
+  left     down right _    _    left down up   right del  bspc _   
+  end      _    pgdn  _    _    _    _    _    _     _    _
+  _        _    _     _    _    _    _    _    _     _    _
+)
+
+;; =======================================================================
+;; [레이어 2] ★ Nav Lock 완전 고정 레이어
+;; navlock 모드에서는 esc/capslock/rsft/lsft/space 키를 누르면 해제.
+;; =======================================================================
+(deflayer navlock_layer
+  @spc_navlock_on_mod  XX    XX    XX    XX    XX    XX    XX    XX     XX    XX    XX    XX
+  @spc_navlock_on_mod  home  up    pgup  XX    XX    XX    home  end    pgup  pgdn  XX    XX
+  left                 down  right XX    XX    left  down  up    right  del   bspc  XX
+  end                  XX    pgdn  XX    XX    XX    XX    XX    XX     XX    XX
+  @spc_navlock_on_mod  @spc_navlock_on_mod     @spc_navlock_on_mod      XX    XX    XX    XX XX XX XX XX
+)
+
+(deflayer keylock_on_layer
+  XX        XX    XX    XX    XX    XX    XX    XX    XX     XX    XX    XX    XX
+  XX        XX    XX    XX    XX    XX    XX    XX    XX     XX    XX    XX    XX   
+  XX        XX    XX    XX    XX    XX    XX    XX    XX     XX    XX    XX
+  XX        XX    XX    XX    XX    XX    XX    XX    XX     XX    XX
+  XX        XX    XX    @rctl_keylock_on_mod    XX    XX     XX    XX    XX    XX XX
+)
+
+;; (defsrc
+;;   esc      1    2    3    4    5    6    7    8    9    0    -    =
+;;   caps     q    w    e    r    t    y    u    i    o    p    [    ]
+;;   a        s    d    f    g    h    j    k    l    ;    '    bksl
+;;   z        x    c    v    b    n    m    ,    .    rsft f24
+;;   lalt   spc ralt rctl    bspc enter left right up down del
+;; )
+(deflayer numberpad_layer
+  XX        XX    XX    XX    XX    XX    XX    XX    XX     XX    XX    XX    XX  
+  XX        XX    XX    XX    XX    XX    XX     7     8      9    XX    XX    XX   
+  XX        XX    XX    XX    XX    left   4     5     6  right   del    XX
+  XX        XX    XX    XX    XX    XX     1     2     3     XX    XX
+  XX         0    XX    XX    XX    XX    XX    XX    XX     XX    XX
+)

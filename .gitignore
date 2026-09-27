@@ -1,0 +1,5 @@
+*.exe
+*.dll
+
+# 윈도우용 드라이버
+Interception/
