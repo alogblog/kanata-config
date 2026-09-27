@@ -21,7 +21,7 @@
      sig_caps (cmd /home/joon/.local/bin/sync_capslock_status_with_polybar.sh)
      sig_navlock_off (cmd polybar-msg hook navlock 1)
      sig_navlock_on  (cmd polybar-msg hook navlock 2)
-	 sig_keyslock_off (cmd polybar-msg hook keyslock 1)
+     sig_keyslock_off (cmd polybar-msg hook keyslock 1)
      sig_keyslock_on  (cmd polybar-msg hook keyslock 2)
   )
 )

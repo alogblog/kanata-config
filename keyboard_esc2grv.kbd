@@ -7,6 +7,9 @@
       /dev/input/by-id/usb-ZXW_USB_Keyboard_123456-event-kbd
       /dev/input/by-id/usb-KEYBOARD_AJAZZ_AK029-event-kbd
     )
+  
+    process-unmapped-keys yes
+    danger-enable-cmd yes
   )
 )
 

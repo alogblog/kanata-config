@@ -1,5 +1,8 @@
 *.exe
 *.dll
 
+bak/
+bak_*/
+
 # 윈도우용 드라이버
 Interception/
