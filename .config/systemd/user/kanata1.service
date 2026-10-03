@@ -1,0 +1,20 @@
+[Unit]
+Description=kanata1 - One hand keyboard
+After=default.target
+# systemctl --user daemon-reload
+# systemctl --user restart kanata1.service
+# -> 자동으로 kanata1 -> kanata2 -> mouseless 순서로 전부 재시작
+
+[Service]
+Type=simple
+ExecStartPre=/bin/sh -c 'rm -f %t/kanata1 %t/kanata1.ev %t/kanata1.log'
+ExecStart=%h/.local/bin/kanata --cfg %h/.config/kanata/kanata1.kbd
+ExecStartPost=/bin/sh -c 'sleep 1.5; EV=$(grep -A4 "\"kanata\"" /proc/bus/input/devices | grep -o "event[0-9]*" | tail -n1); if [ -n "$EV" ]; then ln -sf /dev/input/$EV %t/kanata1; echo $EV > %t/kanata1.ev; fi'
+ExecStopPost=/bin/sh -c 'rm -f %t/kanata1 %t/kanata1.ev; sleep 0.5'
+Restart=on-failure
+RestartSec=1
+
+[Install]
+WantedBy=default.target
+
+

@@ -1,0 +1,187 @@
+;;
+;; 한손키보드의 알파벳은 특수키코드로 출력한다(kanata1.kbd)
+;; 이 출력코드를 새로운 kanata instance에서 입력을 받아서 이곳에서 모두 처리한다.
+;; 이를 위해서 aja.kbd를 이용한 kanata를 먼저 실행하고, kanata가 만든 가상입력장치를
+;; /dev/input/kanata1 로 미리 심볼릭 링크를 만들고 이 장치를 입력으로 얻는 방식이다.
+;; 윈도우에서는 interception 드라이버를 이용해서 aja.kbd를, 일반장치를 이용해서 gen.kbd를 실행해야 한다.
+;; 
+(defcfg
+  linux-dev (
+    /run/user/1000/kanata1
+    ;;/dev/input/by-id/usb-1ea7_2.4G_RF_Keyboard___Mouse-event-kbd
+    /dev/input/by-id/usb-YJS_MicroChip_F61Keyboard_0D4D25807124-event-kbd
+  )	
+	;; linux-dev-names-include (
+	;; 	"kanata" ;; ajazz 키보드 담당 kanata가 먼저 실행되면 그 장치이름을 이용해서 이로부터 키 입력을 받는 방법.
+  ;;  하지만 kanata는 복수의 instance가 모두 같은 이름이라서, 이렇게 하면 현재 instance도 연결해서 무한루프 문제.
+  ;;  EJTVRWRGGGGGGGGGGGTRDGGHEYAWSGRFFFFFFFFFSDXSXGWDDDDDDAFQ  WDwsssssssssd qsaaaaaaaaaaaaaaaaaaaXfcdac SSZZAZZZZZZZZZZZF VVVVVVVVVVVVVVVVVVVVVCCCCCCCCCSㅊ ㅁㅆ따라서 위처럼 id로 직접 지정. 대신 /dev/input/kanata1는 첫번째 instance 실행후 수동으로 심볼릭 링크로 생성.
+	;; 	"2.4G RF Keyboard & Mouse"
+	;; )
+
+  ;; c 누른 상태에서 d 누를 때 c가 hold로 바뀌는 걸 막습니다.
+  concurrent-tap-hold yes
+
+  process-unmapped-keys yes 
+  danger-enable-cmd yes
+)
+
+(include "localkey.kbd")
+
+(platform (linux)
+  (defalias
+  ;; =======================================================================
+  ;; [Polybar IPC 신호 전송 명령어 정의]
+  ;; hook capslock 1 ➡️ 평소 소문자 모드 (text)
+  ;; hook capslock 2 ➡️ 대문자 잠금 모드 (TEXT)
+  ;; hook navlock 2 ➡️ 방향키 전면 잠금 모드 (NAV)
+  ;; 끝에 &를 붙여 실행 대기(Block)로 인한 키보드 굳어짐 버그를 완벽 차단합니다.
+  ;; =======================================================================
+  ;; caps의 경우에도 navlock처럼 on/off를 구분할수도 있지만, 그럴 경우에 layer를 하나 더 만들어야한다.
+  ;; capslock키의 경우에 액션이 3탭까지 있어야 되도록 간단히 하기 위해서 토글시에 같은 script만 호출하고,
+  ;; 이 스크립트 내에서 capslock키의 상태를 쉘을 이용해 알아낸후에, 이를 반영하는 방법을 취했다.
+  ;; cmd_caps_off (cmd bash -c "polybar-msg hook capslock 1 &")
+  ;; cmd_caps_on  (cmd bash -c "polybar-msg hook capslock 2 &")
+     cmd_caps (cmd ./scripts/sync_capslock_status_with_polybar.sh)
+     cmd_navlock_off (cmd polybar-msg hook navlock 1)
+     cmd_navlock_on  (cmd polybar-msg hook navlock 2)
+     cmd_keyslock_off (cmd polybar-msg hook keyslock 1)
+     cmd_keyslock_on  (cmd polybar-msg hook keyslock 2)
+  )
+)
+
+(platform (win winiov2 wintercept)
+  (defalias 
+	 ;; nav,key-lock은 on/off를 각기 다른 명령으로 처리.
+	 ;; caps-lock은 3탭을 별도의 layer를 만들지 않고 바로 간단히 처리하기 위해 on/off시에 항상 같은 스크립트(capslock_status.ps1) 실행.
+	 ;; 그 스크립트 내에서 현재 caps 상태를 알아낸후에 osd_nav를 이용해 osd 처리.
+	 ;; osd_nav.exe는 osd_nav.ahk AutoHotKey로 컴파일해서 만든 실행파일이다.
+	 ;; 따라서 capslock_status.ps1, osd_nav.ahk(소스), osd_nav.exe가 필요하다.
+     cmd_caps (cmd powershell -WindowStyle Hidden -ExecutionPolicy Bypass -File C:\Users\joon\Documents\kanata\capslock_status.ps1)
+     cmd_navlock_on  (cmd ./osd_nav.exe NAV)
+     cmd_navlock_off (cmd powershell -WindowStyle Hidden -Command "Get-Process | Where-Object {$_.MainWindowTitle -eq 'OSD_NAV'} | Stop-Process -Force")
+	   cmd_keyslock_on  (cmd ./osd_nav.exe KEYS)
+     cmd_keyslock_off (cmd powershell -WindowStyle Hidden -Command "Get-Process | Where-Object {$_.MainWindowTitle -eq 'OSD_KEYS'} | Stop-Process -Force")
+  )
+)
+
+(defalias
+  navon (tap-dance 200 (
+    (layer-while-held nav_layer) 
+    (multi lalt @cmd_navlock_on (layer-switch navlock_layer))
+  ))
+  navoff (tap-hold 150 150 (multi @cmd_navlock_off (layer-switch base)) spc)
+  caps (tap-dance 300 (
+    (tap-hold 150 150 esc (layer-while-held nav_layer))
+    ;;tap-hold 150 150 (multi @cmd_navlock_on (layer-switch navlock_layer)) lctrl)
+    (multi @cmd_navlock_on (layer-switch navlock_layer)) ;;더블탭홀드에 ctrl기능 제외.
+    (multi caps @cmd_caps)
+  ))
+  lalt2 (tap-dance 300 (
+    (tap-hold 150 150 _ (layer-while-held num_layer))
+    (tap-hold 150 150 _ (layer-while-held special_layer))
+  ))
+
+  kylck1 (tap-dance 260 (
+    rctl 
+    (multi @cmd_keyslock_on (layer-switch keylock_on_layer))
+  ))
+
+  kylck0 (tap-dance 260 (
+    XX 
+    (multi @cmd_keyslock_off (layer-switch base))
+  ))
+
+  num (tap-hold-press 120 250 v (layer-while-held num_layer))
+  ;;sp  (tap-hold-press-timeout 90 200 c (layer-while-held special_layer) c)
+  sp  (tap-hold-press 90 200 c (layer-while-held special_layer))
+  rsft2ret XX  ;; /키의 shift사용에 익숙해질때가지, 엔터키로 맵핑을 비활성하고 아무값도 출력안하게.
+
+  slsh (tap-dance 300 (
+    (tap-hold 150 150 /  rsft)
+  ))
+
+  ;; grv 키를 눌렀을 때의 동작 정의
+  ;; 기본(Shift 없음): Shift+grv (~) 입력
+  ;; Shift가 눌린 상태: grv (`) 입력
+  ;; (fork <기본_동작> <Shift_눌렸을때_동작> (<감지할_modifier_목록>))
+  ;; 그냥 누르면 ~ (S-grv), Shift 누르고 누르면 강제로 Shift를 뗀 ` (` / grv)
+  tild1st (fork (macro S-grv) (unmod grv) (lshift rshift))
+)
+(defsrc  
+  c1 c2 c3 c4 c5 c6  esc     grv     1       2       3       4       5       6       7       8       9       0       -       =       bspc
+  cq cw ce cr ct     tab     q       w       e       r       t       y       u       i       o       p       [       ]       \
+  ca cs cd cf cg     caps    a       s       d       f       g       h       j       k       l       ;       '       ret
+  cz cx cc cv        lsft    z       x       c       v       b       n       m       ,       .       /       rsft
+                     lctl    lmet    lalt    spc     ralt    menu   rctl
+)
+;;
+;; capsloc키 : 
+;;    - 1탭: esc, 홀드: nav mode
+;;    - 2탭: nav lock mode
+;;    - 3탭: capslock mode
+;; 일반키보드의 왼쪽 rdfg에 방향키, tv에 페이지업다운, c에 딜리트키.
+;; 한손키보드의 c에 특수키 할당, v에 숫자키 할당.
+;; 한손키보드의 alt키에 nav 기능 할당. hold -> nav, double tap -> nav lock mode(스페이스바로 해제      ㅡ  ㅏㅡ ㅓㅓㅓㅓㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠ).
+;; 일반키보드의 rctl키 더블탭 -> 키보드 입력 lock mode.(같은 키 더블탭으로 해제)
+;; right shift key를 return키로 맵핑
+;; 슬래시키를 탭하면 본래기능, 홀드하면 right shift키로 작동.
+;; right alt키를 홀드->숫자모드, 더블탭홀드->특수문자모드.
+(deflayer base
+  1  2  3  4  5  6  esc      @tild1st 1        2       3        4        5        6        7        8        9        0        -        =       bspc
+  q  w  e  r  t     tab      q        w        e       up       pgup     y        u        i        o        p        [        ]        \
+  a  s  d  f  g     @caps    a        s        left    down     right    h        j        k        l        ;        '        ret
+  z  x  c  v        lsft     z        x        del     pgdn     b        n        m        ,        .        @slsh    @rsft2ret
+                    lctl     lmet     @lalt2   spc     ralt     ret      @kylck1
+)
+
+(deflayer nav_layer
+ XX XX XX XX XX XX  XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX 
+ XX XX XX XX XX     XX       XX       XX       XX      XX       XX       pgup     home     end      pgdn     bspc     XX       XX       XX
+ XX XX XX XX XX     XX       XX       XX       XX      XX       XX       left     down     up       right    del      XX       XX
+ XX XX XX XX        XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX 
+                    XX       XX       XX       XX      XX       XX       XX 
+)
+(deflayer navlock_layer
+ XX XX XX XX XX XX  XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX 
+ XX XX XX XX XX     XX       XX       XX       XX      XX       XX       pgup     home     end      pgdn     bspc     XX       XX       XX
+ XX XX XX XX XX     XX       XX       XX       XX      XX       XX       left     down     up       right    del      XX       XX
+ XX XX XX XX        XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX 
+                    XX       XX       XX       @navoff XX       XX       XX 
+)
+
+(deflayer keylock_on_layer
+ XX XX XX XX XX XX  XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
+ XX XX XX XX XX     XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
+ XX XX XX XX XX     XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX
+ XX XX XX XX        XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX
+                    XX       XX       XX       XX      XX       XX       @kylck0
+)
+(deflayer num_layer
+ XX XX XX XX XX XX  XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
+ XX XX XX XX XX     XX       XX       XX       XX      XX       XX       6        7        8        9        0        XX       XX       XX
+ XX XX XX XX XX     XX       XX       XX       XX      XX       XX       1        2        3        4        5        XX       XX
+ XX XX XX XX        XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX
+                    XX       XX       XX       XX      XX       XX       XX
+)
+(deflayer special_layer
+ XX XX XX XX XX XX  XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
+ XX XX XX XX XX     XX       XX       XX       XX      XX       XX       S-6      S-7      S-8      S-9      S-0      XX       XX       XX
+ XX XX XX XX XX     XX       XX       XX       XX      XX       XX       S-1      S-2      S-3      S-4      S-5      XX       XX
+ XX XX XX XX        XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX
+                    XX       XX       XX       XX      XX       XX       XX
+)
+;; (deflayer passthrough
+;;  _  _  _  _  _  _   _        _        _        _       _        _        _        _        _        _        _        _        _        _        _  
+;;  _  _  _  _  _      _        _        _        _       _        _        _        _        _        _        _        _        _        _
+;;  _  _  _  _  _      _        _        _        _       _        _        _        _        _        _        _        _        _
+;;  _  _  _  _         _        _        _        _       _        _        _        _        _        _        _        _  
+;;                     _        _        _        _       _        _        _  
+;; )
+
+;; (deflayer all_block
+;;  XX XX XX XX XX XX  XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
+;;  XX XX XX XX XX     XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
+;;  XX XX XX XX XX     XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX
+;;  XX XX XX XX        XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX
+;;                     XX       XX       XX       XX      XX       XX       XX
+;; )

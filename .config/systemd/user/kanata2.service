@@ -1,0 +1,22 @@
+[Unit]
+Description=kanata2 - main brain
+After=kanata1.service
+Requires=kanata1.service
+BindsTo=kanata1.service
+PartOf=kanata1.service
+
+[Service]
+Type=simple
+ExecStartPre=/bin/sh -c 'for i in $(seq 1 50); do [ -L %t/kanata1 ] && [ -e %t/kanata1 ] && exit 0; sleep 0.2; done; exit 1'
+ExecStart=%h/.local/bin/kanata --cfg %h/.config/kanata/kanata2.kbd
+ExecStartPost=/bin/sh -c '\
+  sleep 1.2; \
+  EV1=$(cat %t/kanata1.ev 2>/dev/null); \
+  EV2=$(grep -A4 "\"kanata\"" /proc/bus/input/devices | grep -o "event[0-9]*" | while read ev; do if [ "$ev" != "$EV1" ]; then echo $ev; fi; done | tail -n1); \
+  if [ -n "$EV2" ]; then ln -sf /dev/input/$EV2 %t/kanata2; echo $EV2 > %t/kanata2.ev; fi'
+ExecStopPost=/bin/sh -c 'rm -f %t/kanata2 %t/kanata2.ev; sleep 0.3'
+Restart=on-failure
+RestartSec=1
+
+[Install]
+WantedBy=default.target
