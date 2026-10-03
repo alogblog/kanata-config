@@ -1,0 +1,6 @@
+[Unit]
+Description=kanata watchdog
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/kanata-check.sh

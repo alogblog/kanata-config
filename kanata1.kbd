@@ -2,6 +2,9 @@
   linux-dev (
     /dev/input/by-id/usb-KEYBOARD_AJAZZ_AK029-event-kbd
   )
+  ;; 사용도중에 먹통이 되면 죽도록. 그러면 systemd가 다시 시작하도록.
+  ;; 대신 처음 부팅시에는 timer를 이용해서 ak029 장치가 연결되어야 시작하게.
+  linux-continue-if-no-devs-found false
 
   windows-interception-keyboard-hwids-exclude (
     ;; 현재 윈도우에서 intercept드라이버 에러문제로, 기기별 구분을 사용하기 힘들다.
