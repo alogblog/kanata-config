@@ -13,8 +13,8 @@
   )	
 	;; linux-dev-names-include (
 	;; 	"kanata" ;; ajazz 키보드 담당 kanata가 먼저 실행되면 그 장치이름을 이용해서 이로부터 키 입력을 받는 방법.
-  ;;  하지만 kanata는 복수의 instance가 모두 같은 이름이라서, 이렇게 하면 현재 instance도 연결해서 무한루프 문제.
-  ;;  EJTVRWRGGGGGGGGGGGTRDGGHEYAWSGRFFFFFFFFFSDXSXGWDDDDDDAFQ  WDwsssssssssd qsaaaaaaaaaaaaaaaaaaaXfcdac SSZZAZZZZZZZZZZZF VVVVVVVVVVVVVVVVVVVVVCCCCCCCCCSㅊ ㅁㅆ따라서 위처럼 id로 직접 지정. 대신 /dev/input/kanata1는 첫번째 instance 실행후 수동으로 심볼릭 링크로 생성.
+    ;;  하지만 kanata는 복수의 instance가 모두 같은 이름이라서, 이렇게 하면 현재 instance도 연결해서 무한루프 문제.
+    ;;  EJTVRWRGGGGGGGGGGGTRDGGHEYAWSGRFFFFFFFFFSDXSXGWDDDDDDAFQ  WDwsssssssssd qsaaaaaaaaaaaaaaaaaaaXfcdac SSZZAZZZZZZZZZZZF VVVVVVVVVVVVVVVVVVVVVCCCCCCCCCSㅊ ㅁㅆ따라서 위처럼 id로 직접 지정. 대신 /dev/input/kanata1는 첫번째 instance 실행후 수동으로 심볼릭 링크로 생성.
 	;; 	"2.4G RF Keyboard & Mouse"
 	;; )
 
@@ -25,7 +25,7 @@
   danger-enable-cmd yes
 )
 
-(include "localkey.kbd")
+;; (include "localkey.kbd")
 
 (platform (linux)
   (defalias
@@ -108,11 +108,11 @@
   tild1st (fork (macro S-grv) (unmod grv) (lshift rshift))
 )
 (defsrc  
-  c1 c2 c3 c4 c5 c6  esc     grv     1       2       3       4       5       6       7       8       9       0       -       =       bspc
-  cq cw ce cr ct     tab     q       w       e       r       t       y       u       i       o       p       [       ]       \
-  ca cs cd cf cg     caps    a       s       d       f       g       h       j       k       l       ;       '       ret
-  cz cx cc cv        lsft    z       x       c       v       b       n       m       ,       .       /       rsft
-                     lctl    lmet    lalt    spc     ralt    menu   rctl
+                    esc     grv     1       2       3       4       5       6       7       8       9       0       -       =       bspc
+  f13 f14           tab     q       w       e       r       t       y       u       i       o       p       [       ]       \
+  f15 f16 f17       caps    a       s       d       f       g       h       j       k       l       ;       '       ret
+  f18 f19           lsft    z       x       c       v       b       n       m       ,       .       /       rsft
+                    lctl    lmet    lalt    spc     ralt    menu   rctl
 )
 ;;
 ;; capsloc키 : 
@@ -127,61 +127,61 @@
 ;; 슬래시키를 탭하면 본래기능, 홀드하면 right shift키로 작동.
 ;; right alt키를 홀드->숫자모드, 더블탭홀드->특수문자모드.
 (deflayer base
-  1  2  3  4  5  6  esc      @tild1st 1        2       3        4        5        6        7        8        9        0        -        =       bspc
-  q  w  e  r  t     tab      q        w        e       up       pgup     y        u        i        o        p        [        ]        \
-  a  s  d  f  g     @caps    a        s        left    down     right    h        j        k        l        ;        '        ret
-  z  x  c  v        lsft     z        x        del     pgdn     b        n        m        ,        .        @slsh    @rsft2ret
+                    esc      @tild1st 1        2       3        4        5        6        7        8        9        0        -        =       bspc
+  r  t              tab      q        w        e       up       pgup     y        u        i        o        p        [        ]        \
+  d  f  g           @caps    a        s        left    down     right    h        j        k        l        ;        '        ret
+  c  v              lsft     z        x        del     pgdn     b        n        m        ,        .        @slsh    @rsft2ret
                     lctl     lmet     @lalt2   spc     ralt     ret      @kylck1
 )
 
 (deflayer nav_layer
- XX XX XX XX XX XX  XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX 
- XX XX XX XX XX     XX       XX       XX       XX      XX       XX       pgup     home     end      pgdn     bspc     XX       XX       XX
- XX XX XX XX XX     XX       XX       XX       XX      XX       XX       left     down     up       right    del      XX       XX
- XX XX XX XX        XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX 
+                    XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX 
+ XX XX              XX       XX       XX       XX      XX       XX       pgup     home     end      pgdn     bspc     XX       XX       XX
+ XX XX XX           XX       XX       XX       XX      XX       XX       left     down     up       right    del      XX       XX
+ XX XX              XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX 
                     XX       XX       XX       XX      XX       XX       XX 
 )
 (deflayer navlock_layer
- XX XX XX XX XX XX  XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX 
- XX XX XX XX XX     XX       XX       XX       XX      XX       XX       pgup     home     end      pgdn     bspc     XX       XX       XX
- XX XX XX XX XX     XX       XX       XX       XX      XX       XX       left     down     up       right    del      XX       XX
- XX XX XX XX        XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX 
+                    XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX 
+ XX XX              XX       XX       XX       XX      XX       XX       pgup     home     end      pgdn     bspc     XX       XX       XX
+ XX XX XX           XX       XX       XX       XX      XX       XX       left     down     up       right    del      XX       XX
+ XX XX              XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX 
                     XX       XX       XX       @navoff XX       XX       XX 
 )
 
 (deflayer keylock_on_layer
- XX XX XX XX XX XX  XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
- XX XX XX XX XX     XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
- XX XX XX XX XX     XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX
- XX XX XX XX        XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX
+                    XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
+ XX XX              XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
+ XX XX XX           XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX
+ XX XX              XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX
                     XX       XX       XX       XX      XX       XX       @kylck0
 )
 (deflayer num_layer
- XX XX XX XX XX XX  XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
- XX XX XX XX XX     XX       XX       XX       XX      XX       XX       6        7        8        9        0        XX       XX       XX
- XX XX XX XX XX     XX       XX       XX       XX      XX       XX       1        2        3        4        5        XX       XX
- XX XX XX XX        XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX
+                    XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
+ XX XX              XX       XX       XX       XX      XX       XX       6        7        8        9        0        XX       XX       XX
+ XX XX XX           XX       XX       XX       XX      XX       XX       1        2        3        4        5        XX       XX
+ XX XX              XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX
                     XX       XX       XX       XX      XX       XX       XX
 )
 (deflayer special_layer
- XX XX XX XX XX XX  XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
- XX XX XX XX XX     XX       XX       XX       XX      XX       XX       S-6      S-7      S-8      S-9      S-0      XX       XX       XX
- XX XX XX XX XX     XX       XX       XX       XX      XX       XX       S-1      S-2      S-3      S-4      S-5      XX       XX
- XX XX XX XX        XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX
+                    XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
+ XX XX              XX       XX       XX       XX      XX       XX       S-6      S-7      S-8      S-9      S-0      XX       XX       XX
+ XX XX XX           XX       XX       XX       XX      XX       XX       S-1      S-2      S-3      S-4      S-5      XX       XX
+ XX XX              XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX
                     XX       XX       XX       XX      XX       XX       XX
 )
 ;; (deflayer passthrough
-;;  _  _  _  _  _  _   _        _        _        _       _        _        _        _        _        _        _        _        _        _        _  
-;;  _  _  _  _  _      _        _        _        _       _        _        _        _        _        _        _        _        _        _
-;;  _  _  _  _  _      _        _        _        _       _        _        _        _        _        _        _        _        _
-;;  _  _  _  _         _        _        _        _       _        _        _        _        _        _        _        _  
+;;                     _        _        _        _       _        _        _        _        _        _        _        _        _        _        _  
+;;  _  _               _        _        _        _       _        _        _        _        _        _        _        _        _        _
+;;  _  _  _            _        _        _        _       _        _        _        _        _        _        _        _        _
+;;  _  _               _        _        _        _       _        _        _        _        _        _        _        _  
 ;;                     _        _        _        _       _        _        _  
 ;; )
 
 ;; (deflayer all_block
-;;  XX XX XX XX XX XX  XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
-;;  XX XX XX XX XX     XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
-;;  XX XX XX XX XX     XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX
-;;  XX XX XX XX        XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX
+;;                     XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
+;;  XX XX              XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
+;;  XX XX XX           XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX
+;;  XX XX              XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX
 ;;                     XX       XX       XX       XX      XX       XX       XX
 ;; )

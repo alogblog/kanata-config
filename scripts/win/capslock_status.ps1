@@ -2,7 +2,7 @@ Add-Type -AssemblyName System.Windows.Forms
 Start-Sleep -Milliseconds 80  # caps키가 토글될 시간 살짝 대기
 
 $isOn = [System.Windows.Forms.Control]::IsKeyLocked('CapsLock')
-$exe = "C:\Users\joon\Documents\kanata\osd_nav.exe"
+$exe = "C:\kanata\osd_nav.exe"
 $title = "OSD_CAPS"
 
 # 이미 떠있는 OSD_CAPS 프로세스 찾기

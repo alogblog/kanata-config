@@ -1,21 +1,30 @@
+작업 스케줄러에 kanata1, kanata2 2개를 등록하지 말고, 두 개를 순서대로 띄우는 배치 파일 1개만 등록하세요.
 
-#파워쉘을 관리자 권한으로 열고 복붙:
-#현재는 intercept 드라이버 문제로, esc2grv 하나만 실행.
+1. C:\kanata\start-kanata.bat 만들기
 
-$exe = "C:\Users\joon\Documents\kanata\kanata_windows_gui_wintercept_cmd_allowed_x64.exe"
-$cfg1 = "C:\Users\joon\Documents\kanata\keyboard_esc2grv.kbd"
-$cfg2 = "C:\Users\joon\Documents\kanata\keyboard_general.kbd"
+bat
+@echo off
+REM 기존에 떠있는거 다 죽이기
+taskkill /F /IM kanata_wintercept.exe /T 2>nul
+taskkill /F /IM kanata_winiov2.exe /T 2>nul
+timeout /t 1 /nobreak >nul
 
-# Task 1 - esc2grv
-$Action1 = New-ScheduledTaskAction -Execute $exe -Argument "--cfg `"$cfg1`" --tray-icon"
-$Trigger1 = New-ScheduledTaskTrigger -AtLogOn
-$Principal1 = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
-$Settings1 = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
-Register-ScheduledTask -TaskName "kanata-esc2grv" -Action $Action1 -Trigger $Trigger1 -Principal $Principal1 -Settings $Settings1 -Force
+REM 1. 한손키보드 담당 wintercept를 먼저 띄움 (가장 중요)
+start "" /B "C:\kanata\kanata_wintercept.exe" -c "C:\kanata\kanata1.kbd"
 
-# Task 2 - general
-$Action2 = New-ScheduledTaskAction -Execute $exe -Argument "--cfg `"$cfg2`" --tray-icon"
-$Trigger2 = New-ScheduledTaskTrigger -AtLogOn
-$Principal2 = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
-$Settings2 = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
-Register-ScheduledTask -TaskName "kanata-general" -Action $Action2 -Trigger $Trigger2 -Principal $Principal2 -Settings $Settings2 -Force
+REM 2. 가상장치가 생길 때까지 3초 대기 - 리눅스의 ExecStartPre 역할
+timeout /t 3 /nobreak >nul
+
+REM 3. 이제 일반키보드 담당 winiov2 띄움
+start "" /B "C:\kanata\kanata_winiov2.exe" -c "C:\kanata\kanata2.kbd"
+
+9줄 숨겨짐
+2. 작업 스케줄러 설정은 1개만
+
+작업 1, 작업 2는 둘 다 삭제
+새 작업 1개:
+트리거: 로그온 시
+동작: 프로그램 시작 -> C:\kanata\start-kanata.bat
+조건: 가장 높은 수준의 권한으로 실행 체크 (winiov2, wintercept 둘 다 관리자 권한 필수)
+설정: 이미 작업이 실행 중인 경우 -> 새 인스턴스 시작 안 함
+이렇게 하면 100% kanata1이 먼저 잡고, 3초 뒤에 kanata2가 나머지 키보드를 잡습니다.
