@@ -96,9 +96,10 @@
   sp  (tap-hold-press 90 200 c (layer-while-held special_layer))
   rsft2ret XX  ;; /키의 shift사용에 익숙해질때가지, 엔터키로 맵핑을 비활성하고 아무값도 출력안하게.
 
-  slsh (tap-dance 300 (
-    (tap-hold 150 150 /  rsft)
-  ))
+  ;; slsh (tap-dance 300 (
+  ;;   (tap-hold 150 150 /  rsft)
+  ;; ))
+  slsh (tap-hold-press 200 200 /  rsft)
 
   ;; grv 키를 눌렀을 때의 동작 정의
   ;; 기본(Shift 없음): Shift+grv (~) 입력
@@ -136,15 +137,15 @@
 
 (deflayer nav_layer
                     XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX 
- XX XX              XX       XX       XX       XX      XX       XX       pgup     home     end      pgdn     bspc     XX       XX       XX
+ XX XX              XX       XX       XX       XX      XX       XX       del      home     end      bspc     XX       XX       XX       XX
  XX XX XX           XX       XX       XX       XX      XX       XX       left     down     up       right    del      XX       XX
  XX XX              XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX 
                     XX       XX       XX       XX      XX       XX       XX 
 )
 (deflayer navlock_layer
                     XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX 
- XX XX              XX       XX       XX       XX      XX       XX       pgup     home     end      pgdn     bspc     XX       XX       XX
- XX XX XX           XX       XX       XX       XX      XX       XX       left     down     up       right    del      XX       XX
+ XX XX              XX       XX       XX       XX      XX       XX       del      home     end      bspc     XX       XX       XX       XX
+ XX XX XX           XX       XX       XX       XX      XX       XX       left     down     up       right    XX       XX       XX
  XX XX              XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX 
                     XX       XX       XX       @navoff XX       XX       XX 
 )
@@ -158,16 +159,16 @@
 )
 (deflayer num_layer
                     XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
- XX XX              XX       XX       XX       XX      XX       XX       6        7        8        9        0        XX       XX       XX
- XX XX XX           XX       XX       XX       XX      XX       XX       1        2        3        4        5        XX       XX
- XX XX              XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX
+ XX XX              XX       XX       XX       XX      XX       XX       XX       7        8        9        0        XX       XX       XX
+ XX XX XX           XX       XX       XX       XX      XX       XX       XX       4        5        6        XX       XX       XX
+ XX XX              XX       XX       XX       XX      XX       XX       1        2        3        XX       XX       XX
                     XX       XX       XX       XX      XX       XX       XX
 )
 (deflayer special_layer
                     XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX
- XX XX              XX       XX       XX       XX      XX       XX       S-6      S-7      S-8      S-9      S-0      XX       XX       XX
- XX XX XX           XX       XX       XX       XX      XX       XX       S-1      S-2      S-3      S-4      S-5      XX       XX
- XX XX              XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX
+ XX XX              XX       XX       XX       XX      XX       XX       XX       S-7      S-8      S-9      S-0      XX       XX       XX
+ XX XX XX           XX       XX       XX       XX      XX       XX       XX       S-4      S-5      S-6      XX       XX       XX
+ XX XX              XX       XX       XX       XX      XX       XX       S-1      S-2      S-3      XX       XX       XX
                     XX       XX       XX       XX      XX       XX       XX
 )
 ;; (deflayer passthrough
