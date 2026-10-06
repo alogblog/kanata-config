@@ -87,7 +87,7 @@
     (multi caps @cmd_caps)
   ))
   lalt2 (tap-dance 300 (
-    (tap-hold 150 150 esc (layer-while-held nav_layer))
+    (tap-hold 150 150 spc (layer-while-held nav_layer))
     (tap-hold 150 150 XX  (layer-while-held num_layer))
   ))
 
