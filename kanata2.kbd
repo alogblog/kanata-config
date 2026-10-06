@@ -70,15 +70,25 @@
     (multi lalt @cmd_navlock_on (layer-switch navlock_layer))
   ))
   navoff (tap-hold 150 150 (multi @cmd_navlock_off (layer-switch base)) spc)
+  ;; caps (tap-dance 300 (
+  ;;   (tap-hold 150 150 lalt (layer-while-held nav_layer))
+  ;;   ;;(multi @cmd_navlock_on (layer-switch navlock_layer)) ;;더블탭홀드에 ctrl기능 제외.
+  ;;   (multi caps @cmd_caps)
+  ;; ))
+  ;; lalt2 (tap-dance 300 (
+  ;;   (tap-hold 150 150 esc (layer-while-held num_layer))
+  ;;   (tap-hold 150 150 _   (layer-while-held special_layer))
+  ;; ))
+
   caps (tap-dance 300 (
-    (tap-hold 150 150 esc (layer-while-held nav_layer))
-    ;;tap-hold 150 150 (multi @cmd_navlock_on (layer-switch navlock_layer)) lctrl)
-    (multi @cmd_navlock_on (layer-switch navlock_layer)) ;;더블탭홀드에 ctrl기능 제외.
+    (tap-hold 150 150 lalt (layer-while-held num_layer))
+    ;;(multi @cmd_navlock_on (layer-switch navlock_layer)) ;;더블탭홀드에 ctrl기능 제외.
+    (tap-hold 150 150 esc (layer-while-held special_layer))
     (multi caps @cmd_caps)
   ))
   lalt2 (tap-dance 300 (
-    (tap-hold 150 150 _ (layer-while-held num_layer))
-    (tap-hold 150 150 _ (layer-while-held special_layer))
+    (tap-hold 150 150 esc (layer-while-held nav_layer))
+    (tap-hold 150 150 XX  (layer-while-held num_layer))
   ))
 
   kylck1 (tap-dance 260 (
@@ -94,7 +104,7 @@
   num (tap-hold-press 120 250 v (layer-while-held num_layer))
   ;;sp  (tap-hold-press-timeout 90 200 c (layer-while-held special_layer) c)
   sp  (tap-hold-press 90 200 c (layer-while-held special_layer))
-  rsft2ret XX  ;; /키의 shift사용에 익숙해질때가지, 엔터키로 맵핑을 비활성하고 아무값도 출력안하게.
+  ;;rsft2ret XX  ;; /키의 shift사용에 익숙해질때가지, 엔터키로 맵핑을 비활성하고 아무값도 출력안하게.
 
   ;; slsh (tap-dance 300 (
   ;;   (tap-hold 150 150 /  rsft)
@@ -107,6 +117,14 @@
   ;; (fork <기본_동작> <Shift_눌렸을때_동작> (<감지할_modifier_목록>))
   ;; 그냥 누르면 ~ (S-grv), Shift 누르고 누르면 강제로 Shift를 뗀 ` (` / grv)
   tild1st (fork (macro S-grv) (unmod grv) (lshift rshift))
+
+  ;; 한줄 선택
+  ml (macro home S-end)
+  mc (macro C-c)
+  mv (macro C-v)
+  mx (macro C-x)
+  mz (macro C-z)
+  msz (macro C-S-z)
 )
 (defsrc  
                     esc     grv     1       2       3       4       5       6       7       8       9       0       -       =       bspc
@@ -131,22 +149,22 @@
                     esc      @tild1st 1        2       3        4        5        6        7        8        9        0        -        =       bspc
   r  t              tab      q        w        e       up       pgup     y        u        i        o        p        [        ]        \
   d  f  g           @caps    a        s        left    down     right    h        j        k        l        ;        '        ret
-  c  v              lsft     z        x        del     pgdn     b        n        m        ,        .        @slsh    @rsft2ret
+  c  v              lsft     z        x        del     pgdn     b        n        m        ,        .        /        rsft
                     lctl     lmet     @lalt2   spc     ralt     ret      @kylck1
 )
 
 (deflayer nav_layer
                     XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX 
- XX XX              XX       XX       XX       XX      XX       XX       del      home     end      bspc     XX       XX       XX       XX
- XX XX XX           XX       XX       XX       XX      XX       XX       left     down     up       right    del      XX       XX
- XX XX              XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX 
+ XX XX              XX       XX       XX       XX      XX       XX       @ml      home     up       end      bspc     XX       XX       XX
+ XX XX XX           XX       XX       XX       XX      XX       XX       @mz      left     down     right    del      XX       XX
+ XX XX              XX       XX       XX       XX      XX       @mx      @mc      @mv      @msz     XX       XX       XX 
                     XX       XX       XX       XX      XX       XX       XX 
 )
 (deflayer navlock_layer
                     XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX 
- XX XX              XX       XX       XX       XX      XX       XX       del      home     end      bspc     XX       XX       XX       XX
- XX XX XX           XX       XX       XX       XX      XX       XX       left     down     up       right    XX       XX       XX
- XX XX              XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX 
+ XX XX              XX       XX       XX       XX      XX       XX       @ml      home     up       end      bspc     XX       XX       XX
+ XX XX XX           XX       XX       XX       XX      XX       XX       @mz      left     down     right    del      XX       XX
+ XX XX              XX       XX       XX       XX      XX       @mx      @mc      @mv      @msz     XX       XX       XX 
                     XX       XX       XX       @navoff XX       XX       XX 
 )
 
