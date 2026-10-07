@@ -86,11 +86,12 @@
     (tap-hold 150 150 esc (layer-while-held special_layer))
     (multi caps @cmd_caps)
   ))
-  lalt2 (tap-dance 300 (
-    (tap-hold 150 150 spc (layer-while-held nav_layer))
-    (tap-hold 150 150 XX  (layer-while-held num_layer))
-  ))
-
+  ;; lalt2 (tap-dance 200 (
+  ;;   (tap-hold-press 120 150 bspc (layer-while-held nav_layer))
+  ;;   (tap-hold-press 120 150 XX   (layer-while-held num_layer))
+  ;; ))
+  ;; lalt를 백스페이스처럼 쓸때 탭댄스(더블탭 목적)를 하면 느려져서, 잘 안쓰는 더블탭 포기.
+  lalt2 (tap-hold-press 160 300 bspc (layer-while-held nav_layer))
   kylck1 (tap-dance 260 (
     rctl 
     (multi @cmd_keyslock_on (layer-switch keylock_on_layer))
@@ -125,6 +126,7 @@
   mx (macro C-x)
   mz (macro C-z)
   msz (macro C-S-z)
+  mbsp (macro C-bspc)
 )
 (defsrc  
                     esc     grv     1       2       3       4       5       6       7       8       9       0       -       =       bspc
@@ -155,7 +157,7 @@
 
 (deflayer nav_layer
                     XX       XX       XX       XX      XX       XX       XX       XX       XX       XX       XX       XX       XX       XX       XX 
- XX XX              XX       XX       XX       XX      XX       XX       @ml      home     up       end      bspc     XX       XX       XX
+ XX XX              XX       XX       XX       XX      XX       XX       @ml      home     up       end      @mbsp    XX       XX       XX
  XX XX XX           XX       XX       XX       XX      XX       XX       @mz      left     down     right    del      XX       XX
  XX XX              XX       XX       XX       XX      XX       @mx      @mc      @mv      @msz     XX       XX       XX 
                     XX       XX       XX       XX      XX       XX       XX 
